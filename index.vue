@@ -40,87 +40,92 @@
   </div>
 </template>
 
+
 <script>
-import countries from './countryList'
+  import countries from './countryList'
 
-export default {
-  props: {
-    toFront: {
-      type: Array,
-      default () {
-        return []
-      }
-    },
-    countryCode: {
-      type: String,
-      default: Object.keys(countries)[0],
-
-      validator (code) {
-        var clearCode = String(code).toLowerCase()
-        return !!countries[clearCode]
-      }
-    }
-  },
-  data () {
-    return {
-      currentCode: this.countryCode,
-      hideSubMenu: true
-    }
-  },
-  computed: {
-    currentData () {
-      return countries[this.currentCode]
-    },
-
-    frontCountriesArray () {
-      const toFrontCodes = {}
-      this.toFront.forEach((code) => {
-        const stringCode = String(code)
-        const needObj = countries[stringCode]
-
-        if (needObj) {
-          toFrontCodes[stringCode] = needObj
+  export default {
+    props: {
+      toFront: {
+        type: Array,
+        default: () => {
+          return []
         }
-      })
-      return toFrontCodes
+      },
+      countryCode: {
+        type: String,
+        default: Object.keys(countries)[0],
+        validator(code) {
+          var clearCode = String(code).toLowerCase()
+          return !!countries[clearCode]
+        }
+      }
     },
 
-    countriesArray () {
-      const countryCopie = {...countries}
+    data() {
+      return {
+        currentCode: this.countryCode,
+        hideSubMenu: true
+      }
+    },
 
-      this.toFront.forEach((code) => {
-        delete countryCopie[code]
-      })
-      return countryCopie
+    computed: {
+      currentData() {
+        return countries[this.currentCode]
+      },
+      frontCountriesArray() {
+        const toFrontCodes = {}
+        this.toFront.forEach((code) => {
+          const stringCode = String(code)
+          const needObj = countries[stringCode]
+
+          if(needObj) {
+            toFrontCodes[stringCode] = needObj
+          }
+        })
+        return toFrontCodes
+      },
+      countriesArray() {
+        const countryCopie = { ...countries }
+        this.toFront.forEach((code) => {
+          delete countryCopie[code]
+        })
+        return countryCopie
+      }
+    },
+
+    watch: {
+      countryCode(newCode) {
+        this.setCountry(countries[newCode])
+      }
+    },
+
+    methods: {
+      setCountry(item) {
+        this.currentCode = item.code
+        this.toFront.push(String(item.code))
+        this.$emit('excountry', item)
+      }
+    },
+
+    mounted() {
+      this.$emit('excountry', countries[this.countryCode])
     }
-  },
-  watch: {
-    countryCode: function (newCode) {
-      this.setCountry(countries[newCode])
-    }
-  },
-  methods: {
-    setCountry: function (item) {
-      this.currentCode = item.code
-      this.toFront.push(String(item.code))
-      this.$emit('excountry', item)
-    }
-  },
-  mounted: function () {
-    this.$emit('excountry', countries[this.countryCode])
   }
-}
 </script>
 
-<style lang="stylus" scoped>
-  @import "intl.css"
 
-  .intl-tel-input
-    height: 40px
-    color: #666
-    font-size: 14px
-    .country-list
-      width: 335px
-      height: 400px
-      margin-top: 2px
+<style lang="scss" scoped>
+  @import "intl.css";
+
+  .intl-tel-input {
+    height: 40px;
+    color: #666;
+    font-size: 14px;
+    .country-list {
+      width: 335px;
+      height: 400px;
+      margin-top: 2px;
+    }
+  }
 </style>
